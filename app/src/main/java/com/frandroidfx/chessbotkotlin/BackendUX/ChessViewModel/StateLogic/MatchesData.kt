@@ -1,4 +1,4 @@
-package com.frandroidfx.chessbotkotlin.BackendUX.StateLogic
+package com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel.StateLogic
 
 data class DatiPartita(
     val id: Long = 0,

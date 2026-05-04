@@ -1,4 +1,4 @@
-package com.frandroidfx.chessbotkotlin.BackendUX
+package com.frandroidfx.chessbotkotlin.BackendUX.NetModules
 import org.pytorch.executorch.Module
 import org.pytorch.executorch.Tensor
 import org.pytorch.executorch.EValue
@@ -6,11 +6,13 @@ import org.pytorch.executorch.EValue
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Square
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class ChessNet {
     /*alla inizializzazione va caricato,
     */
-    private lateinit var module: Module
+    private var module: Module? = null
 
     fun fenToTensor(fen: String): Tensor {
         val board = Board()
@@ -51,8 +53,10 @@ class ChessNet {
     }
 
     fun tryModel(inputTensor : Tensor) : Float{
+        val currentModule = module ?: throw IllegalStateException("Exception : Rete non caricata")
+
         val inputEValue = EValue.from(inputTensor)
-        val outputEValues : Array<EValue> = module.forward(inputEValue)
+        val outputEValues : Array<EValue> = currentModule.forward(inputEValue)
         val outputTensor = outputEValues[0].toTensor()
 
         return outputTensor.dataAsFloatArray[0]

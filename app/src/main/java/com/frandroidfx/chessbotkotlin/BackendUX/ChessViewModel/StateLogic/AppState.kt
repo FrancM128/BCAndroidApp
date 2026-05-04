@@ -1,4 +1,4 @@
-package com.frandroidfx.chessbotkotlin.FrontendUI
+package com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel.StateLogic
 
 enum class ColoreScelto {BIANCO , NERO}
 

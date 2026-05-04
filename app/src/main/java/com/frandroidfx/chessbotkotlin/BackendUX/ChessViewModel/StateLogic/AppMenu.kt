@@ -1,6 +1,4 @@
-package com.frandroidfx.chessbotkotlin.BackendUX.StateLogic
-
-import com.frandroidfx.chessbotkotlin.FrontendUI.ColoreScelto
+package com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel.StateLogic
 
 sealed interface AppMenu {
     data object MainMenu: AppMenu

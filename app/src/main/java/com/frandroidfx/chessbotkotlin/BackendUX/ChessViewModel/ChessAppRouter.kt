@@ -1,4 +1,4 @@
-package com.frandroidfx.chessbotkotlin.FrontendUI
+package com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -11,7 +11,7 @@ fun ChessAppRouter(viewModel: ChessViewModel){
     val statoCorrente by viewModel.uiState.collectAsState()
 
     when(val stato = statoCorrente){
-        
+
         is AppMenu.MainMenu -> {
             // TODO: Implementare UI Menu
         }
