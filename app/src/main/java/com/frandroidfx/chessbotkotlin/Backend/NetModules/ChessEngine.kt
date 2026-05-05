@@ -141,18 +141,19 @@ class ChessEngine {
     }
 
     fun scegliMossaMigliore(board : Board,depth: Int = 3): Move?{
-        var mossaUci = libroAperture!!.getMossaMigliore(board.zobristKey)
+        if(usaLibro && libroAperture != null ){
 
-        if(usaLibro && mossaUci != null ){
-            var mossa = libroAperture!!.convertiUciInMove(board , mossaUci)
-            println("mossa trovata  nel libro")
-            return mossa
-        }else{
-            usaLibro = false
-            var p : Pair <Move? , Float> = negamax(board,depth = depth)
-            return p.first
+            val mossaUci = libroAperture!!.getMossaMigliore(board.zobristKey)
+
+            if(mossaUci != null) {
+                var mossa = libroAperture!!.convertiUciInMove(board, mossaUci)
+                println("mossa trovata  nel libro")
+                return mossa
+            }else{ usaLibro = false }
+
         }
+        var p : Pair <Move? , Float> = negamax(board,depth = depth)
+        return p.first
     }
-
 }
 
