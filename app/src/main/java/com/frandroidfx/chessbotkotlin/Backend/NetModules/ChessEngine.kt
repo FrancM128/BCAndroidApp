@@ -1,4 +1,4 @@
-package com.frandroidfx.chessbotkotlin.BackendUX.NetModules
+package com.frandroidfx.chessbotkotlin.Backend.NetModules
 import android.content.Context
 import com.facebook.soloader.SoLoader
 import com.github.bhlangonijr.chesslib.Board

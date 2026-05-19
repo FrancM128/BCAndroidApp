@@ -1,6 +1,6 @@
 package com.frandroidfx.chessbotkotlin
 
-import com.frandroidfx.chessbotkotlin.BackendUX.NetModules.PolyglotBook
+import com.frandroidfx.chessbotkotlin.Backend.NetModules.PolyglotBook
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 

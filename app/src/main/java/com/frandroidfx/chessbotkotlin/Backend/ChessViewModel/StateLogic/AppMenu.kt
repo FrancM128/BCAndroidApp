@@ -1,4 +1,4 @@
-package com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel.StateLogic
+package com.frandroidfx.chessbotkotlin.Backend.ChessViewModel.StateLogic
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

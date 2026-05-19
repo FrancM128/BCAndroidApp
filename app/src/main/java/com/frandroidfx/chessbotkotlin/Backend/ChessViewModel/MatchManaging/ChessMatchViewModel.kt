@@ -1,13 +1,16 @@
-package com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel.MatchManaging
+package com.frandroidfx.chessbotkotlin.Backend.ChessViewModel.MatchManaging
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel.StateLogic.ColoreScelto
+import com.frandroidfx.chessbotkotlin.Backend.ChessViewModel.StateLogic.ColoreScelto
 import com.github.bhlangonijr.chesslib.Side
-import com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel.StateLogic.SchermataAttuale
-import com.frandroidfx.chessbotkotlin.BackendUX.NetModules.ChessEngine
+import com.frandroidfx.chessbotkotlin.Backend.ChessViewModel.StateLogic.SchermataAttuale
+import com.frandroidfx.chessbotkotlin.Backend.NetModules.ChessEngine
+import com.frandroidfx.chessbotkotlin.MatchDataBase.Partita
+import com.frandroidfx.chessbotkotlin.MatchDataBase.RepositoryPartite
 import com.github.bhlangonijr.chesslib.Board
+import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,10 +20,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
-class ChessMatchViewModel(application : Application)  : AndroidViewModel(application){
+class ChessMatchViewModel(
+    application : Application,
+    private val repository: RepositoryPartite
+    )  : AndroidViewModel(application){
     private val engine = ChessEngine()
     var board = Board( )
         private set
+
+    private val _fenAttuale = MutableStateFlow(board.fen)
+    val fenAttuale: StateFlow<String> = _fenAttuale.asStateFlow()
     private val _schermata = MutableStateFlow(SchermataAttuale.MENU_PRINCIPALE)
     val schermata : StateFlow<SchermataAttuale> = _schermata.asStateFlow()
 
@@ -33,18 +42,36 @@ class ChessMatchViewModel(application : Application)  : AndroidViewModel(applica
     private val _depthEngine = MutableStateFlow(3)
     val depthEngine: StateFlow<Int> = _depthEngine.asStateFlow()
 
+    private val _cronologiaMosse = MutableStateFlow<List<String>>(emptyList())
+    val cronologiaMosse: StateFlow<List<String>> = _cronologiaMosse.asStateFlow()
+
     init{
         viewModelScope.launch{
             engine.inizializza(application.applicationContext)
         }
     }
 
+    fun salvaFenNellaStroia(nuovaFen: String){
+        _cronologiaMosse.value =_cronologiaMosse.value + nuovaFen
+    }
     fun impostaProfondita(nuovaProfondita : Int){
         if(nuovaProfondita in 3..15){
             _depthEngine.value = nuovaProfondita
         }
     }
+    fun getMosseLegaliPerCella(nomeCasella : String?): List<String>{
+        if(nomeCasella == null) return emptyList()
 
+        return try{
+            val casellaPartenza = Square.fromValue(nomeCasella.uppercase())
+            val tutteLeMosse = board.legalMoves()
+            tutteLeMosse
+                .filter { mossa-> mossa.from == casellaPartenza}
+                .map{mossa -> mossa.to.toString().lowercase()}
+        }catch(e: IllegalArgumentException){
+            emptyList()
+        }
+    }
     fun avviaNuovaPartita(scelta : ColoreScelto){
         board = Board()
         val coloreDefinitivo = when(scelta) {
@@ -91,5 +118,23 @@ class ChessMatchViewModel(application : Application)  : AndroidViewModel(applica
                 _staPensando.value = false
             }
         }
+    }
+    fun salvaNelDatabase(risultatoFinale: String){
+        val pgnAttuale = board.history.joinToString(" "){it.toString()}
+        val coloreStr = if(_colorePlayer.value == Side.WHITE) "BIANCO" else "NERO"
+        val tempoattuale = System.currentTimeMillis()
+
+        val nuovaPartita = Partita(
+            pgn = pgnAttuale,
+            risultato = risultatoFinale,
+            coloreGiocato = coloreStr,
+            timestamp =  tempoattuale
+        )
+        viewModelScope.launch(Dispatchers.IO){
+            repository.salvaPartita(nuovaPartita)
+        }
+    }
+    fun terminaPartita(){
+        _schermata.value = SchermataAttuale.FINE_PARTITA
     }
 }

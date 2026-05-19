@@ -1,4 +1,4 @@
-package com.frandroidfx.chessbotkotlin.BackendUX.NetModules
+package com.frandroidfx.chessbotkotlin.Backend.NetModules
 
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Piece

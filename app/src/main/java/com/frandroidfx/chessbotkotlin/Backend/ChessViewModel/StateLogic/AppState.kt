@@ -1,4 +1,4 @@
-package com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel.StateLogic
+package com.frandroidfx.chessbotkotlin.Backend.ChessViewModel.StateLogic
 
 
 enum class SchermataAttuale{ MENU_PRINCIPALE,IN_PARTITA,FINE_PARTITA}

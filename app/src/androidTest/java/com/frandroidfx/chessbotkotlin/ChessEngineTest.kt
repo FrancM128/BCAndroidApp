@@ -3,7 +3,7 @@ package com.frandroidfx.chessbotkotlin
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.frandroidfx.chessbotkotlin.BackendUX.NetModules.ChessEngine
+import com.frandroidfx.chessbotkotlin.Backend.NetModules.ChessEngine
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail

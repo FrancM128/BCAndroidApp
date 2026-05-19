@@ -1,4 +1,4 @@
-package com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel
+package com.frandroidfx.chessbotkotlin.Backend.ChessViewModel
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -7,9 +7,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel.MatchManaging.ChessMatchViewModel
-import com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel.StateLogic.AppMenuScreen
-import com.frandroidfx.chessbotkotlin.BackendUX.ChessViewModel.StateLogic.ColoreScelto
+import com.frandroidfx.chessbotkotlin.Backend.ChessViewModel.MatchManaging.ChessMatchViewModel
+import com.frandroidfx.chessbotkotlin.Backend.ChessViewModel.StateLogic.AppMenuScreen
+import com.frandroidfx.chessbotkotlin.Backend.ChessViewModel.StateLogic.ColoreScelto
 
 @Composable
 fun ChessAppRouter(viewModel: ChessViewModel){
