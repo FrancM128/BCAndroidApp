@@ -12,7 +12,7 @@ class ChessMatchViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ChessMatchViewModel::class.java)) {
             val database = AppDatabase.getDatabase(application)
-            val repository = RepositoryPartite(database.partitaDao)
+            val repository = RepositoryPartite(database.partitaDao())
             @Suppress("UNCHECKED_CAST")
             return ChessMatchViewModel(application, repository) as T
         }

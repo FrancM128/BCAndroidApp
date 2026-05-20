@@ -33,8 +33,11 @@ class ChessMatchViewModel(
     private val _schermata = MutableStateFlow(SchermataAttuale.MENU_PRINCIPALE)
     val schermata : StateFlow<SchermataAttuale> = _schermata.asStateFlow()
 
-    private val _colorePlayer = MutableStateFlow(Side.WHITE)
-    val colorePlayer: StateFlow<Side> = _colorePlayer.asStateFlow()
+    private val _colorePlayer = MutableStateFlow(ColoreScelto.BIANCO)
+    val colorePlayer: StateFlow<ColoreScelto> = _colorePlayer.asStateFlow()
+
+    private val _coloreDefinitivo = MutableStateFlow(Side.WHITE)
+    val coloreDefinitivo: StateFlow<Side> = _coloreDefinitivo.asStateFlow()
 
     private val _staPensando = MutableStateFlow(false)
     val staPensando : StateFlow<Boolean> = _staPensando.asStateFlow()
@@ -42,8 +45,15 @@ class ChessMatchViewModel(
     private val _depthEngine = MutableStateFlow(3)
     val depthEngine: StateFlow<Int> = _depthEngine.asStateFlow()
 
+    private val _valutazioneAttuale = MutableStateFlow(0f)
+    val valutazioneAttuale: StateFlow<Float> = _valutazioneAttuale.asStateFlow()
+
     private val _cronologiaMosse = MutableStateFlow<List<String>>(emptyList())
     val cronologiaMosse: StateFlow<List<String>> = _cronologiaMosse.asStateFlow()
+
+
+    val partiteSalvate: kotlinx.coroutines.flow.Flow<List<Partita>> = repository.tutteLePartite
+
 
     init{
         viewModelScope.launch{
@@ -79,7 +89,7 @@ class ChessMatchViewModel(
             ColoreScelto.NERO -> Side.BLACK
             ColoreScelto.CASUALE -> if(Random.nextBoolean()) Side.WHITE else Side.BLACK
         }
-        _colorePlayer.value = coloreDefinitivo
+        _coloreDefinitivo.value = coloreDefinitivo
         _schermata.value = SchermataAttuale.IN_PARTITA
 
         if(coloreDefinitivo == Side.BLACK){
@@ -87,8 +97,32 @@ class ChessMatchViewModel(
         }
     }
 
+    fun avviaAnalisi(partita: Partita){
+        board = Board()
+        val mosseUci = partita.pgn.split(" ").filter{it.isNotEmpty()}
+
+        val listaFen = mutableListOf(board.fen)
+        for(mossa in mosseUci){
+            board.doMove(mossa)
+            listaFen.add(board.fen)
+        }
+        _cronologiaMosse.value = listaFen
+        _fenAttuale.value = board.fen
+        _schermata.value = SchermataAttuale.ANALISI
+    }
+
+    fun aggiornaValutazione(fen: String){
+        viewModelScope.launch(Dispatchers.Default){
+            val score = engine.nnue.evaluate(fen)
+            _valutazioneAttuale.value = score
+        }
+    }
+
+    fun tornaAlMenu() {
+        _schermata.value = SchermataAttuale.MENU_PRINCIPALE
+    }
     fun giocaMossaPlayer(mossaUci : String){
-        if(_staPensando.value || board.sideToMove != _colorePlayer.value) return
+        if(_staPensando.value || board.sideToMove != _coloreDefinitivo.value) return
         val mossa = Move(mossaUci , board.sideToMove)
         if(board.isMoveLegal(mossa,true)){
             board.doMove(mossa)
@@ -121,7 +155,7 @@ class ChessMatchViewModel(
     }
     fun salvaNelDatabase(risultatoFinale: String){
         val pgnAttuale = board.history.joinToString(" "){it.toString()}
-        val coloreStr = if(_colorePlayer.value == Side.WHITE) "BIANCO" else "NERO"
+        val coloreStr = if(_coloreDefinitivo.value == Side.WHITE) "BIANCO" else "NERO"
         val tempoattuale = System.currentTimeMillis()
 
         val nuovaPartita = Partita(
@@ -135,6 +169,7 @@ class ChessMatchViewModel(
         }
     }
     fun terminaPartita(){
+        salvaNelDatabase(risultatoFinale = "Abb.")
         _schermata.value = SchermataAttuale.FINE_PARTITA
     }
 }

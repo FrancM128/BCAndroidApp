@@ -13,7 +13,7 @@ import java.io.FileOutputStream
 
 
 class ChessEngine {
-    private var nnue: ChessNet = ChessNet()
+    var nnue: ChessNet = ChessNet()
     private var usaLibro: Boolean = true
     private var libroAperture: PolyglotBook? = null
     var depth: Int = 3

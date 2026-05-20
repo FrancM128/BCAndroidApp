@@ -12,11 +12,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-
+import com.frandroidfx.chessbotkotlin.R
 
 
 @Composable
@@ -30,16 +31,16 @@ fun Chessboard(
     onCasellaCliccata: (String) ->Unit
 
 ){
-    val lightSquare = Color(0xFF00D9B5)
-    val darkSquare = Color(0xFFB58863)
-    val highlightSelection = Color(0x80FFF033)
-    val highlightLastMove = Color(0x6000FF00)
-    val dotColor = Color(0x80000000)
+    val lightSquare = Color(0xFFFFCA01)
+    val darkSquare = Color(0xFF6B3300)
+    val highlightSelection = Color(0x9000FFFF)
+    val highlightLastMove = Color(0x7AFF0000)
+    val dotColor = Color(0x809A9A9A)
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .border(2.dp , Color.DarkGray)
+            .border(2.dp, Color.DarkGray)
     ){
         var iterRighe = if(giocaComeBianco) 0..7 else 7 downTo 0
         var iterColonne = if(giocaComeBianco)0..7 else 7 downTo 0
@@ -65,10 +66,10 @@ fun Chessboard(
                     }
 
                     Box(modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .background(coloreSfondoAttuale)
-                            .clickable { onCasellaCliccata(nomeCasella) },
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .background(coloreSfondoAttuale)
+                        .clickable { onCasellaCliccata(nomeCasella) },
                         contentAlignment = Alignment.Center
                     ){
                         if(col == (if(giocaComeBianco) 0 else 7)){
@@ -77,7 +78,9 @@ fun Chessboard(
                                 color = if(isLight) darkSquare else lightSquare,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.align(Alignment.TopStart).padding(2.dp)
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .padding(2.dp)
                             )
                         }
                         if(row == (if (giocaComeBianco) 7 else 0)){
@@ -86,14 +89,18 @@ fun Chessboard(
                                 color = if(isLight) darkSquare else lightSquare,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.align(Alignment.BottomEnd).padding(2.dp)
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(2.dp)
                             )
                         }
                         if(pezzoCorrente != ' '){
                             DisegnaPezzo(pezzoCorrente)
                         }
                         if(isMossaPossibile){
-                            Box(modifier = Modifier.fillMaxSize(0.3f).background(dotColor, shape  = CircleShape))
+                            Box(modifier = Modifier
+                                .fillMaxSize(0.3f)
+                                .background(dotColor, shape = CircleShape))
                         }
                     }
                 }
@@ -106,36 +113,49 @@ fun Chessboard(
 fun DisegnaPezzo(pezzoFen: Char) {
     //placeholder per immagini appena pronte
     val drawableId: Int? = when (pezzoFen) {
-        'P' -> 0 // R.drawable.ic_wp
-        'N' -> 0
-        'B' -> 0
-        'R' -> 0
-        'Q' -> 0
-        'K' -> 0
-        'p' -> 0 // R.drawable.ic_bp
-        'n' -> 0
-        'b' -> 0
-        'r' -> 0
-        'q' -> 0
-        'k' -> 0
+        'P' -> R.drawable.wp
+        'N' -> R.drawable.wn
+        'B' -> R.drawable.wb
+        'R' -> R.drawable.wr
+        'Q' -> R.drawable.wq
+        'K' -> R.drawable.wk
+        'p' -> R.drawable.bp
+        'n' -> R.drawable.bn
+        'b' -> R.drawable.bb
+        'r' -> R.drawable.br
+        'q' -> R.drawable.bq
+        'k' -> R.drawable.bk
         else -> null
     }
-    if(drawableId != null && drawableId != 0 ){
-        Image(
-            painter = painterResource(id = drawableId),
-            contentDescription = "Pezzo $pezzoFen",
-            modifier = Modifier.fillMaxSize(0.85f)
-        )
-    }else{
-        val coloreTesto = if(pezzoFen.isUpperCase())Color.White else Color.Black
+    if(drawableId == null) return
+    Image(
+        painter = painterResource(id = drawableId),
+        contentDescription = "Pezzo $pezzoFen",
+        modifier = Modifier.fillMaxSize()
+    )
+
+}
+@Composable
+fun BarraValutazione(score: Float){
+    val clampedScore = score.coerceIn(-5f,5f)
+    val percentualeBianco = (clampedScore +5f) /10f
+
+    Column( modifier = Modifier
+        .fillMaxWidth()
+        .padding(bottom = 8.dp)){
         Text(
-            text = pezzoFen.toString(),
-            color = coloreTesto,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold
+            if(score >= 0) "+${String.format("%.1f", score)}" else String.format("%.1f", score),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
+        Box(modifier = Modifier .fillMaxWidth() .height(10.dp).background(Color.Black)){
+            Box(modifier = Modifier.fillMaxWidth(percentualeBianco).fillMaxHeight().background(Color.White).align(Alignment.CenterEnd))
+            Box(modifier = Modifier.width(2.dp).fillMaxHeight().background(Color.Black).align(Alignment.Center))
+        }
     }
 }
+
 
 fun FenToMap(fen: String) : Array<String>{
     val disposizionePezzi = fen.split(" ")[0]
@@ -153,3 +173,4 @@ fun FenToMap(fen: String) : Array<String>{
         costruttoreRiga.toString()
     }.toTypedArray()
 }
+

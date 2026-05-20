@@ -63,6 +63,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose.jvmstubs)
 
     testImplementation(libs.junit)
+    testImplementation("io.mockk:mockk:1.13.5")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -80,7 +83,7 @@ dependencies {
     implementation("com.facebook.soloader:soloader:0.12.1")
     implementation("com.facebook.fbjni:fbjni:0.7.0")
     //DBMS,Room
-    val room_version = "2.6.1"
+    val room_version = "2.8.4"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
